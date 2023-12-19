@@ -21,21 +21,15 @@ img_width = 50
 
 data_dir = "carpeta"
 
-training_percentage = 0.75
+training_percentage = 0.7
 validation_percentage = 0.2
-test_percentage = 0.05
+test_percentage = 0.1
 
 train_ds = tf.keras.utils.image_dataset_from_directory(data_dir, validation_split=training_percentage, subset="training",seed=123,image_size=(img_height, img_width), batch_size=batch_size)
 val_ds = tf.keras.utils.image_dataset_from_directory(data_dir,validation_split=validation_percentage,subset="validation",seed=123,image_size=(img_height, img_width),batch_size=batch_size)
-test_ds = tf.keras.utils.image_dataset_from_directory(
-    data_dir,
-    validation_split=test_percentage,
-    subset="validation",
-    seed=123,
-    image_size=(img_height, img_width),
-    batch_size=batch_size
-)
-normalization_layer = layers.Rescaling(1./255)
+test_ds = tf.keras.utils.image_dataset_from_directory(data_dir,validation_split=test_percentage,subset="validation",seed=123,image_size=(img_height, img_width),batch_size=batch_size)
+
+normalization_layer = layers.Rescaling(1./1)
 
 
 # nombre classes
@@ -55,15 +49,15 @@ print(len(image_batch))
 num_classes = len(class_names)
 
 model = Sequential([
-  layers.Rescaling(1./255, input_shape=(img_height, img_width, 3)),
+  layers.Rescaling(1./1, input_shape=(img_height, img_width, 3)),
+  layers.Dropout((0.25)),
   layers.Conv2D(16, 3, padding='same', activation='relu'),
   layers.MaxPooling2D(),
+  layers.Dropout((0.25)),
   layers.Conv2D(32, 3, padding='same', activation='relu'),
   layers.MaxPooling2D(),
-  layers.Conv2D(64, 3, padding='same', activation='relu'),
-  layers.MaxPooling2D(),
   layers.Flatten(),
-  layers.Dense(128, activation='relu'),
+  layers.Dense(64, activation='relu'),
   layers.Dense(num_classes)
 ])
 
@@ -71,10 +65,11 @@ model = Sequential([
 model.compile(optimizer='adam',
               loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
               metrics=['accuracy'])
+
 model.summary()
 
 # Entrenamos el modelo
-epochs=100
+epochs=20
 history = model.fit(
   train_ds,
   validation_data=val_ds,
