@@ -34,6 +34,7 @@ normalization_layer = layers.Rescaling(1./1)
 
 # nombre classes
 class_names = train_ds.class_names
+print(class_names)
 
 
 # Estandarizar los datos
@@ -88,3 +89,4 @@ test_loss, test_accuracy = model.evaluate(normalized_test_ds)
 print(f"\nTest Accuracy: {test_accuracy}")
 print(f"Test Loss: {test_loss}")
 
+model.save('modelo.keras')
